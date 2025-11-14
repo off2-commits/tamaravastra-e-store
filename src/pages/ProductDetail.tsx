@@ -65,7 +65,7 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       <div className="container-custom py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm mb-8 text-muted-foreground">
