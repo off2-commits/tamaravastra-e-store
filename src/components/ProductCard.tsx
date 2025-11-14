@@ -17,22 +17,25 @@ export function ProductCard({ product }: ProductCardProps) {
             className="h-full w-full object-cover transition-smooth group-hover:scale-105"
           />
         </div>
-        <CardContent className="p-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+        <CardContent className="p-6 text-center">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
             {product.category.replace('-', ' ')}
           </p>
-          <h3 className="font-medium text-sm mb-2 line-clamp-2">
+          <h3 className="font-medium text-sm mb-3 line-clamp-2">
             {product.name}
           </h3>
-          <p className="text-lg font-bold text-accent">
+          <p className="text-lg font-bold text-accent mb-4">
             ₹{product.price.toLocaleString('en-IN')}
           </p>
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-3 justify-center">
             {product.colors.slice(0, 3).map((color, i) => (
               <div
                 key={i}
-                className="h-3 w-3 rounded-full border border-border"
-                style={{ backgroundColor: color.hex }}
+                className="h-4 w-4 rounded-full border-2 transition-smooth"
+                style={{
+                  backgroundColor: color.hex,
+                  borderColor: '#e0e0e0'
+                }}
                 title={color.name}
               />
             ))}
