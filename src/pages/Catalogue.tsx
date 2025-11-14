@@ -39,7 +39,7 @@ export default function Catalogue() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       {/* Hero Banner */}
       <section className="relative h-64 flex items-center justify-center bg-primary overflow-hidden">
         <div
