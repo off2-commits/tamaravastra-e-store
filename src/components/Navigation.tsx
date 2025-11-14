@@ -22,7 +22,7 @@ export function Navigation() {
     { to: '/catalogue', label: 'Sarees' },
     { to: '/catalogue?category=silk', label: 'Silk' },
     { to: '/catalogue?category=cotton', label: 'Cotton' },
-    { to: '/catalogue', label: 'Sale' },
+    { to: '/catalogue?sale=true', label: 'Sale' },
   ];
 
   return (
@@ -57,17 +57,6 @@ export function Navigation() {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
-          {navLinks.map(link => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="text-sm hover:text-accent transition-smooth"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <nav className="hidden lg:flex items-center gap-8">
           {navLinks.map(link => (
             <Link
               key={link.to}
