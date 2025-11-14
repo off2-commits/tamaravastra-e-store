@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, User, ShoppingBag, Menu } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 export function Navigation() {
   const { totalItems } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,20 +29,21 @@ export function Navigation() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-custom flex h-16 items-center">
-        {/* Mobile Menu */}
-        <Sheet>
+        {/* Mobile/Tablet Menu */}
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon" className="hover:bg-transparent group">
               <Menu className="h-5 w-5 group-hover:text-accent transition-smooth" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left">
-            <nav className="flex flex-col gap-4">
+          <SheetContent side="left" className="w-64">
+            <nav className="flex flex-col gap-1 mt-8">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-lg hover:text-accent transition-smooth"
+                  onClick={() => setIsSheetOpen(false)}
+                  className="px-4 py-3 text-lg font-medium hover:text-accent hover:bg-accent/10 rounded-lg transition-smooth"
                 >
                   {link.label}
                 </Link>
@@ -61,9 +63,10 @@ export function Navigation() {
             <Link
               key={link.to}
               to={link.to}
-              className="text-sm hover:text-accent transition-smooth"
+              className="text-sm font-medium hover:text-accent transition-smooth relative group"
             >
               {link.label}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
             </Link>
           ))}
         </nav>
