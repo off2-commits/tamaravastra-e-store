@@ -8,7 +8,7 @@ export default function Landing() {
   const bestsellers = getBestsellers();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen page-transition">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div
