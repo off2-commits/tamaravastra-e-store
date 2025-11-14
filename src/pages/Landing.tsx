@@ -24,7 +24,7 @@ export default function Landing() {
         />
         
         <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold mb-4 tracking-wider">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold mb-4 tracking-wider transition-all duration-500">
             TAMARAVASTRA
           </h1>
           <p className="text-2xl sm:text-3xl md:text-4xl mb-3 opacity-90">
@@ -45,7 +45,7 @@ export default function Landing() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-accent text-white hover:bg-accent hover:text-accent-foreground font-medium px-8 h-12 transition-smooth"
+                className="border-white text-white hover:bg-white hover:text-foreground font-medium px-8 h-12 transition-smooth"
               >
                 Shop Party Wear
               </Button>
@@ -80,9 +80,9 @@ export default function Landing() {
       </section>
 
       {/* Free Shipping Banner */}
-      <section className="bg-accent py-4">
+      <section className="bg-foreground py-4">
         <div className="container-custom text-center">
-          <p className="text-accent-foreground font-medium">
+          <p className="text-background font-medium">
             Free standard shipping on all orders!
           </p>
         </div>

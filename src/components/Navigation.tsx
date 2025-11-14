@@ -4,9 +4,19 @@ import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from 'react';
 
 export function Navigation() {
   const { totalItems } = useCart();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { to: '/catalogue', label: 'Sarees' },
@@ -17,12 +27,12 @@ export function Navigation() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container-custom flex h-16 items-center justify-between">
+      <div className="container-custom flex h-16 items-center">
         {/* Mobile Menu */}
         <Sheet>
           <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="hover:bg-transparent group">
+              <Menu className="h-5 w-5 group-hover:text-accent transition-smooth" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
@@ -40,12 +50,23 @@ export function Navigation() {
           </SheetContent>
         </Sheet>
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
+        {/* Logo - centered, appears on scroll */}
+        <Link to="/" className={`flex items-center absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <h1 className="text-2xl font-bold tracking-wider">TAMARAVASTRA</h1>
         </Link>
 
         {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+          {navLinks.map(link => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className="text-sm hover:text-accent transition-smooth"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
         <nav className="hidden lg:flex items-center gap-8">
           {navLinks.map(link => (
             <Link
@@ -59,16 +80,16 @@ export function Navigation() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Search className="h-5 w-5" />
+        <div className="flex items-center gap-4 ml-auto">
+          <Button variant="ghost" size="icon" className="hidden sm:flex hover:bg-transparent group">
+            <Search className="h-5 w-5 group-hover:text-accent transition-smooth" />
           </Button>
-          <Button variant="ghost" size="icon">
-            <User className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="hover:bg-transparent group">
+            <User className="h-5 w-5 group-hover:text-accent transition-smooth" />
           </Button>
           <Link to="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingBag className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative hover:bg-transparent group">
+              <ShoppingBag className="h-5 w-5 group-hover:text-accent transition-smooth" />
               {totalItems > 0 && (
                 <Badge
                   variant="default"
