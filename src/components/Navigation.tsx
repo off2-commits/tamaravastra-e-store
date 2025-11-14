@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Search, User, ShoppingBag, Menu, X } from 'lucide-react';
+import { User, ShoppingBag, Menu } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { SearchDialog } from '@/components/SearchDialog';
 import { useState, useEffect } from 'react';
 
 export function Navigation() {
@@ -73,9 +74,7 @@ export function Navigation() {
 
         {/* Actions */}
         <div className="flex items-center gap-4 ml-auto">
-          <Button variant="ghost" size="icon" className="hidden sm:flex hover:bg-transparent group">
-            <Search className="h-5 w-5 group-hover:text-accent transition-smooth" />
-          </Button>
+          <SearchDialog />
           <Button variant="ghost" size="icon" className="hover:bg-transparent group">
             <User className="h-5 w-5 group-hover:text-accent transition-smooth" />
           </Button>
