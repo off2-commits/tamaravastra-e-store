@@ -110,6 +110,7 @@ export function SearchDialog() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="w-full max-w-2xl p-0 gap-0 rounded-lg border-border/50">
           <DialogHeader className="border-b border-border/50 p-4 pb-0">
+            <DialogTitle className="sr-only">Search Products</DialogTitle>
             <div className="relative w-full pt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
