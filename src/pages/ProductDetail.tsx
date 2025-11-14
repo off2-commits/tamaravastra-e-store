@@ -51,6 +51,19 @@ export default function ProductDetail() {
     });
   };
 
+  const handleBuyNow = () => {
+    if (!selectedColor) return;
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      color: selectedColor.name,
+      maxStock: product.stock,
+    });
+    navigate('/cart');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container-custom py-8">
@@ -149,10 +162,20 @@ export default function ProductDetail() {
             {/* Add to Cart */}
             <Button
               size="lg"
-              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground h-14 text-lg font-medium mb-4"
+              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground h-14 text-lg font-medium mb-3"
               onClick={handleAddToCart}
             >
               Add to Cart
+            </Button>
+
+            {/* Buy Now */}
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full h-14 text-lg font-medium mb-4"
+              onClick={handleBuyNow}
+            >
+              Buy Now
             </Button>
 
             <div className="bg-muted/50 p-4 rounded-lg flex items-center gap-2">
