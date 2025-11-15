@@ -28,7 +28,16 @@ export function Navigation() {
   ];
 
   return (
-    <header className="sticky top-4 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      {/* Free Shipping Banner */}
+      <div className="bg-foreground py-2 w-full">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1400px] text-center">
+          <p className="text-background text-sm font-medium">
+            Free standard shipping on all orders!
+          </p>
+        </div>
+      </div>
+      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-custom flex h-16 items-center">
         {/* Mobile/Tablet Menu */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -94,5 +103,6 @@ export function Navigation() {
         </div>
       </div>
     </header>
+    </>
   );
 }
