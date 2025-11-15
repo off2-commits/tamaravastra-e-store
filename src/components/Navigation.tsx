@@ -28,7 +28,7 @@ export function Navigation() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-10 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-custom flex h-16 items-center">
         {/* Mobile/Tablet Menu */}
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
