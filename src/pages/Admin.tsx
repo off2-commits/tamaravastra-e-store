@@ -141,8 +141,8 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-[60px] z-40 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="container-custom flex items-center justify-between h-16">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="container-custom flex items-center justify-between py-5">
           <div>
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
             <p className="text-sm text-muted-foreground">Manage your shop</p>
