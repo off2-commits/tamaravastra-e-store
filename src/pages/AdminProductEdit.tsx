@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Plus } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, Upload, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,10 @@ export default function AdminProductEdit() {
     colors: product?.colors || [{ name: '', hex: '' }],
   });
 
+  const [images, setImages] = useState([
+    { id: 1, src: product?.image || '/placeholder.svg', name: 'Main Image' },
+  ]);
+  const [draggedId, setDraggedId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   if (!product) {
@@ -68,6 +72,52 @@ export default function AdminProductEdit() {
     }));
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setImages(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            src: event.target?.result as string,
+            name: file.name
+          }]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const handleDragStart = (id: number) => {
+    setDraggedId(id);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, targetId: number) => {
+    e.preventDefault();
+    if (!draggedId) return;
+
+    const draggedIndex = images.findIndex(img => img.id === draggedId);
+    const targetIndex = images.findIndex(img => img.id === targetId);
+
+    if (draggedIndex !== targetIndex) {
+      const newImages = [...images];
+      [newImages[draggedIndex], newImages[targetIndex]] = [newImages[targetIndex], newImages[draggedIndex]];
+      setImages(newImages);
+    }
+    setDraggedId(null);
+  };
+
+  const removeImage = (id: number) => {
+    if (images.length > 1) {
+      setImages(images.filter(img => img.id !== id));
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     // Simulate save
@@ -81,7 +131,7 @@ export default function AdminProductEdit() {
     <div className="min-h-screen bg-background">
       {/* Admin Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="container-custom flex items-center justify-between h-16">
+        <div className="container-custom flex items-center justify-between py-5">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -184,6 +234,56 @@ export default function AdminProductEdit() {
                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Product Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Images</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  {images.map((image) => (
+                    <div
+                      key={image.id}
+                      draggable
+                      onDragStart={() => handleDragStart(image.id)}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, image.id)}
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 border-dashed cursor-move transition-all ${
+                        draggedId === image.id ? 'opacity-50 border-accent' : 'border-border hover:border-accent'
+                      }`}
+                    >
+                      <img src={image.src} alt={image.name} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all flex items-center justify-center gap-2">
+                        <GripVertical className="h-5 w-5 text-white opacity-0 hover:opacity-100" />
+                        {images.length > 1 && (
+                          <button
+                            onClick={() => removeImage(image.id)}
+                            className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg opacity-0 hover:opacity-100 transition-all"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <label className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-accent transition-all flex items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted">
+                    <div className="text-center">
+                      <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-xs text-muted-foreground">Upload</p>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground">Drag to reorder images. First image will be the main product image.</p>
               </CardContent>
             </Card>
 
