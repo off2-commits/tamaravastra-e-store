@@ -10,7 +10,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen page-transition">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden -mt-16">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden -mt-20">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
