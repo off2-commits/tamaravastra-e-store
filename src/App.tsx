@@ -33,14 +33,6 @@ function AppContent() {
   return (
     <>
       <ScrollToTop />
-      {/* Free Shipping Banner */}
-      <div className="bg-foreground py-2 sticky top-0 z-50">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1400px] text-center">
-          <p className="text-background text-sm font-medium">
-            Free standard shipping on all orders!
-          </p>
-        </div>
-      </div>
       <Navigation />
       <Routes>
         <Route path="/" element={<Landing />} />
