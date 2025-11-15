@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, LogOut, Package, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -231,8 +231,12 @@ export default function Admin() {
                 </thead>
                 <tbody>
                   {MOCK_ORDERS.map((order) => (
-                    <tr key={order.id} className="border-b border-border/50 hover:bg-muted/50">
-                      <td className="py-3 px-4 font-medium">{order.id}</td>
+                    <tr
+                      key={order.id}
+                      className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-smooth"
+                      onClick={() => navigate(`/admin/order/${order.id}`)}
+                    >
+                      <td className="py-3 px-4 font-medium text-accent hover:underline">{order.id}</td>
                       <td className="py-3 px-4">{order.customer}</td>
                       <td className="py-3 px-4">{order.items}</td>
                       <td className="py-3 px-4 font-bold text-accent">₹{order.total.toLocaleString('en-IN')}</td>
@@ -275,8 +279,18 @@ export default function Admin() {
                 </thead>
                 <tbody>
                   {mockProducts.slice(0, 5).map((product) => (
-                    <tr key={product.id} className="border-b border-border/50 hover:bg-muted/50">
-                      <td className="py-3 px-4 font-medium">{product.name}</td>
+                    <tr
+                      key={product.id}
+                      className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-smooth"
+                    >
+                      <td className="py-3 px-4 font-medium">
+                        <Link
+                          to={`/admin/product/${product.id}`}
+                          className="text-accent hover:underline"
+                        >
+                          {product.name}
+                        </Link>
+                      </td>
                       <td className="py-3 px-4 capitalize">{product.category.replace('-', ' ')}</td>
                       <td className="py-3 px-4">{product.stock} units</td>
                       <td className="py-3 px-4 font-bold text-accent">₹{product.price.toLocaleString('en-IN')}</td>
