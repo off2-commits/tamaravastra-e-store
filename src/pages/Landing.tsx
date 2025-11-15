@@ -79,14 +79,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Free Shipping Banner */}
-      <section className="bg-foreground py-4">
-        <div className="container-custom text-center">
-          <p className="text-background font-medium">
-            Free standard shipping on all orders!
-          </p>
-        </div>
-      </section>
     </div>
   );
 }
