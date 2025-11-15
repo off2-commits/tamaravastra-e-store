@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Package, CreditCard, User, Mail, Phone, Edit2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, CreditCard, User, Mail, Phone, Edit2, Trash2, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getProductReviews, mockReviews } from '@/lib/reviews';
 
 // Mock detailed order data
 const MOCK_ORDER_DETAILS: Record<string, any> = {
@@ -98,6 +99,19 @@ export default function AdminOrderDetail() {
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [orderStatus, setOrderStatus] = useState(order?.status || '');
   const [customerData, setCustomerData] = useState(order?.customer || {});
+
+  // Get reviews for products in this order
+  const orderReviews = order ? order.items.flatMap(item =>
+    getProductReviews(item.name)
+      .filter(review => review.orderId === orderId)
+  ) : [];
+
+  const handleDeleteReview = (reviewId: string) => {
+    const reviewIndex = mockReviews.findIndex(r => r.id === reviewId);
+    if (reviewIndex > -1) {
+      mockReviews.splice(reviewIndex, 1);
+    }
+  };
 
   if (!order) {
     return (
@@ -368,6 +382,75 @@ export default function AdminOrderDetail() {
                       </div>
                     </div>
                   </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Reviews Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  Reviews for This Order
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {orderReviews.length > 0 ? (
+                  <div className="space-y-4">
+                    {orderReviews.map((review) => (
+                      <div key={review.id} className="p-4 bg-muted/50 rounded-lg">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="font-semibold">{review.reviewerName}</p>
+                            <p className="text-xs text-muted-foreground">{review.date}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteReview(review.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <div className="flex items-center gap-1 mb-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-4 w-4 ${
+                                star <= review.rating
+                                  ? 'fill-accent text-accent'
+                                  : 'text-muted-foreground'
+                              }`}
+                            />
+                          ))}
+                          <span className="text-xs text-muted-foreground ml-2">
+                            {review.rating}/5
+                          </span>
+                        </div>
+
+                        <h4 className="font-semibold text-sm mb-1">{review.title}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">{review.text}</p>
+
+                        {review.images.length > 0 && (
+                          <div className="flex gap-2">
+                            {review.images.map((image, i) => (
+                              <img
+                                key={i}
+                                src={image}
+                                alt={`Review image ${i}`}
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    No reviews yet for this order
+                  </p>
                 )}
               </CardContent>
             </Card>
