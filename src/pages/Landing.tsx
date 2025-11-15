@@ -10,7 +10,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen page-transition">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden -mt-16">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
@@ -45,7 +45,7 @@ export default function Landing() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-foreground font-medium px-8 h-12 transition-smooth"
+                className="border-white text-white hover:bg-transparent hover:border-white/80 font-medium px-8 h-12 transition-smooth"
               >
                 Shop Party Wear
               </Button>
