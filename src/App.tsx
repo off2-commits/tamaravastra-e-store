@@ -12,6 +12,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Admin from "./pages/Admin";
+import AdminOrderDetail from "./pages/AdminOrderDetail";
+import AdminProductEdit from "./pages/AdminProductEdit";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 
@@ -31,10 +33,13 @@ function ScrollToTop() {
 }
 
 function AppContent() {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+
   return (
     <>
       <ScrollToTop />
-      <Navigation />
+      {!isAdminPage && <Navigation />}
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/catalogue" element={<Catalogue />} />
@@ -43,6 +48,8 @@ function AppContent() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:orderId" element={<OrderConfirmation />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/order/:orderId" element={<AdminOrderDetail />} />
+        <Route path="/admin/product/:productId" element={<AdminProductEdit />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
