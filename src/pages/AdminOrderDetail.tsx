@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Package, CreditCard, User, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, CreditCard, User, Mail, Phone, Edit2 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Mock detailed order data
@@ -93,6 +95,9 @@ export default function AdminOrderDetail() {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const order = MOCK_ORDER_DETAILS[orderId || ''];
+  const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [orderStatus, setOrderStatus] = useState(order?.status || '');
+  const [customerData, setCustomerData] = useState(order?.customer || {});
 
   if (!order) {
     return (
@@ -113,7 +118,7 @@ export default function AdminOrderDetail() {
     <div className="min-h-screen bg-background">
       {/* Admin Header */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="container-custom flex items-center justify-between h-16">
+        <div className="container-custom flex items-center justify-between py-5">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -146,15 +151,15 @@ export default function AdminOrderDetail() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Status:</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    order.status === 'Delivered'
-                      ? 'bg-green-100 text-green-800'
-                      : order.status === 'Shipped'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {order.status}
-                  </span>
+                  <select
+                    value={orderStatus}
+                    onChange={(e) => setOrderStatus(e.target.value)}
+                    className="px-3 py-1 rounded-lg border border-border bg-background text-sm font-medium"
+                  >
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
                 </div>
                 {order.trackingNumber && (
                   <div className="flex items-center justify-between">
@@ -251,42 +256,119 @@ export default function AdminOrderDetail() {
           {/* Customer Information */}
           <div>
             <Card>
-              <CardHeader>
+              <CardHeader className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
                   Customer Details
                 </CardTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditingCustomer(!isEditingCustomer)}
+                  className="flex items-center gap-2"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  {isEditingCustomer ? 'Done' : 'Edit'}
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Name</p>
-                  <p className="font-medium">{order.customer.name}</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Mail className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Email</p>
-                    <p className="font-medium">{order.customer.email}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Phone</p>
-                    <p className="font-medium">{order.customer.phone}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 pt-4 border-t border-border">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                  <div className="w-full">
-                    <p className="text-sm text-muted-foreground mb-2">Delivery Address</p>
-                    <p className="font-medium text-sm">{order.customer.address}</p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {order.customer.city}, {order.customer.state} {order.customer.pincode}
-                    </p>
-                    <p className="text-sm text-muted-foreground">{order.customer.country}</p>
-                  </div>
-                </div>
+                {isEditingCustomer ? (
+                  <>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Name</p>
+                      <Input
+                        value={customerData.name}
+                        onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Email</p>
+                      <Input
+                        type="email"
+                        value={customerData.email}
+                        onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                      <Input
+                        value={customerData.phone}
+                        onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="pt-4 border-t border-border">
+                      <p className="text-sm text-muted-foreground mb-2">Address</p>
+                      <Input
+                        value={customerData.address}
+                        onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
+                        className="text-sm mb-2"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          placeholder="City"
+                          value={customerData.city}
+                          onChange={(e) => setCustomerData({...customerData, city: e.target.value})}
+                          className="text-sm"
+                        />
+                        <Input
+                          placeholder="State"
+                          value={customerData.state}
+                          onChange={(e) => setCustomerData({...customerData, state: e.target.value})}
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Input
+                          placeholder="Pincode"
+                          value={customerData.pincode}
+                          onChange={(e) => setCustomerData({...customerData, pincode: e.target.value})}
+                          className="text-sm"
+                        />
+                        <Input
+                          placeholder="Country"
+                          value={customerData.country}
+                          onChange={(e) => setCustomerData({...customerData, country: e.target.value})}
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Name</p>
+                      <p className="font-medium">{customerData.name}</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Mail className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Email</p>
+                        <p className="font-medium">{customerData.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Phone className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                        <p className="font-medium">{customerData.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 pt-4 border-t border-border">
+                      <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="w-full">
+                        <p className="text-sm text-muted-foreground mb-2">Delivery Address</p>
+                        <p className="font-medium text-sm">{customerData.address}</p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {customerData.city}, {customerData.state} {customerData.pincode}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{customerData.country}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
