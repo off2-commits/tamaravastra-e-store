@@ -9,7 +9,7 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center page-transition">
         <div className="text-center">
           <ShoppingBag className="h-24 w-24 mx-auto mb-6 text-muted-foreground" />
           <h2 className="text-3xl font-bold mb-4">Your cart is empty</h2>
@@ -30,7 +30,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       <div className="container-custom py-12">
         <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
 

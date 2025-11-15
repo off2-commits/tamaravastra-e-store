@@ -8,9 +8,9 @@ export default function Landing() {
   const bestsellers = getBestsellers();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen page-transition">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden -mt-20">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
@@ -36,7 +36,7 @@ export default function Landing() {
             <Link to="/catalogue">
               <Button
                 size="lg"
-                className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium px-8 h-12 transition-smooth hover:scale-105"
+                className="bg-accent hover:bg-white text-accent-foreground hover:text-foreground font-medium px-8 h-12 transition-smooth"
               >
                 Shop Sarees
               </Button>
@@ -44,8 +44,7 @@ export default function Landing() {
             <Link to="/catalogue?category=party-wear">
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-foreground font-medium px-8 h-12 transition-smooth"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground font-medium px-8 h-12 transition-smooth"
               >
                 Shop Party Wear
               </Button>
@@ -79,14 +78,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Free Shipping Banner */}
-      <section className="bg-foreground py-4">
-        <div className="container-custom text-center">
-          <p className="text-background font-medium">
-            Free standard shipping on all orders!
-          </p>
-        </div>
-      </section>
     </div>
   );
 }

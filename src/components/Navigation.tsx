@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
-import { Search, User, ShoppingBag, Menu } from 'lucide-react';
+import { User, ShoppingBag, Menu } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { SearchDialog } from '@/components/SearchDialog';
 import { useState, useEffect } from 'react';
 
 export function Navigation() {
   const { totalItems } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,26 +24,36 @@ export function Navigation() {
     { to: '/catalogue', label: 'Sarees' },
     { to: '/catalogue?category=silk', label: 'Silk' },
     { to: '/catalogue?category=cotton', label: 'Cotton' },
-    { to: '/catalogue', label: 'Sale' },
+    { to: '/catalogue?sale=true', label: 'Sale' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      {/* Free Shipping Banner */}
+      <div className="bg-foreground py-2 w-full relative z-50">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1400px] text-center">
+          <p className="text-background text-sm font-medium">
+            Free standard shipping on all orders!
+          </p>
+        </div>
+      </div>
+      <header className="sticky top-10 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-custom flex h-16 items-center">
-        {/* Mobile Menu */}
-        <Sheet>
+        {/* Mobile/Tablet Menu */}
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon" className="hover:bg-transparent group">
               <Menu className="h-5 w-5 group-hover:text-accent transition-smooth" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left">
-            <nav className="flex flex-col gap-4">
+          <SheetContent side="left" className="w-64">
+            <nav className="flex flex-col gap-1 mt-8">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="text-lg hover:text-accent transition-smooth"
+                  onClick={() => setIsSheetOpen(false)}
+                  className="px-4 py-3 text-lg font-medium hover:text-accent hover:bg-accent/10 rounded-lg transition-smooth"
                 >
                   {link.label}
                 </Link>
@@ -56,34 +68,22 @@ export function Navigation() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+        <nav className="hidden lg:flex items-center gap-8 flex-1">
           {navLinks.map(link => (
             <Link
               key={link.to}
               to={link.to}
-              className="text-sm hover:text-accent transition-smooth"
+              className="text-sm font-medium hover:text-accent transition-smooth relative group"
             >
               {link.label}
-            </Link>
-          ))}
-        </nav>
-        <nav className="hidden lg:flex items-center gap-8">
-          {navLinks.map(link => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="text-sm hover:text-accent transition-smooth"
-            >
-              {link.label}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all group-hover:w-full" />
             </Link>
           ))}
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-4 ml-auto">
-          <Button variant="ghost" size="icon" className="hidden sm:flex hover:bg-transparent group">
-            <Search className="h-5 w-5 group-hover:text-accent transition-smooth" />
-          </Button>
+          <SearchDialog />
           <Button variant="ghost" size="icon" className="hover:bg-transparent group">
             <User className="h-5 w-5 group-hover:text-accent transition-smooth" />
           </Button>
@@ -103,5 +103,6 @@ export function Navigation() {
         </div>
       </div>
     </header>
+    </>
   );
 }

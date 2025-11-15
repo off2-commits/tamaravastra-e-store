@@ -60,7 +60,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background page-transition">
       <div className="container-custom py-12">
         <h1 className="text-4xl font-bold mb-8">Checkout</h1>
 

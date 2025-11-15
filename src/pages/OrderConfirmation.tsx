@@ -6,7 +6,7 @@ export default function OrderConfirmation() {
   const { orderId } = useParams();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center page-transition">
       <div className="text-center max-w-md px-4">
         <CheckCircle className="h-24 w-24 text-green-600 mx-auto mb-6" />
         <h1 className="text-4xl font-bold mb-4">Thank You!</h1>
