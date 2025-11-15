@@ -36,7 +36,7 @@ export default function Landing() {
             <Link to="/catalogue">
               <Button
                 size="lg"
-                className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium px-8 h-12 transition-smooth hover:scale-105"
+                className="bg-accent hover:bg-white text-accent-foreground hover:text-foreground font-medium px-8 h-12 transition-smooth"
               >
                 Shop Sarees
               </Button>
@@ -44,8 +44,7 @@ export default function Landing() {
             <Link to="/catalogue?category=party-wear">
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-transparent hover:border-white/80 font-medium px-8 h-12 transition-smooth"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-foreground font-medium px-8 h-12 transition-smooth"
               >
                 Shop Party Wear
               </Button>
