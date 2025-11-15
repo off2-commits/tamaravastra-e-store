@@ -5,6 +5,10 @@ import { getProductById, mockProducts } from '@/lib/products';
 import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/ProductCard';
+import { StarRating } from '@/components/StarRating';
+import { ReviewCard } from '@/components/ReviewCard';
+import { ReviewForm } from '@/components/ReviewForm';
+import { getProductReviews, getAverageRating } from '@/lib/reviews';
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +25,7 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState(product?.colors[0]);
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(0);
+  const [refreshReviews, setRefreshReviews] = useState(0);
 
   if (!product) {
     return (
@@ -208,9 +213,53 @@ export default function ProductDetail() {
           </div>
         </div>
 
+        {/* Reviews Section */}
+        <div className="border-t border-border pt-20">
+          <h2 className="text-3xl font-bold mb-2">Customer Reviews</h2>
+
+          {/* Review Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div className="md:col-span-1">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-4xl font-bold text-accent">{getAverageRating(id || '').toFixed(1)}</p>
+                  <StarRating rating={getAverageRating(id || '')} showText={false} size="lg" />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Based on {getProductReviews(id || '').length} reviews
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Review Form */}
+            <div className="md:col-span-3">
+              <ReviewForm
+                productId={id || ''}
+                onReviewSubmitted={() => setRefreshReviews(r => r + 1)}
+              />
+            </div>
+          </div>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold">All Reviews</h3>
+            {getProductReviews(id || '').length > 0 ? (
+              <div className="space-y-4">
+                {getProductReviews(id || '').map(review => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div>
+          <div className="border-t border-border pt-20">
             <h2 className="text-3xl font-bold mb-8">You May Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedProducts.map(p => (
