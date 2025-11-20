@@ -64,10 +64,18 @@ export default function Landing() {
     <div className="min-h-screen page-transition">
       {/* Hero Section */}
       <section id="hero-section" className="relative h-screen flex items-center justify-center overflow-hidden -mt-20">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          poster={heroImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+        >
+          <source src="/tamaravastra.mp4" type="video/mp4" />
+        </video>
         <div
           className="absolute inset-0"
           style={{
