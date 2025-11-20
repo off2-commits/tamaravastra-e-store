@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, Minus, Plus, Check } from 'lucide-react';
-import { getProductById, mockProducts } from '@/lib/products';
+import { fetchProductById, fetchFilteredProducts } from '@/lib/products';
 import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/ProductCard';
 import { StarRating } from '@/components/StarRating';
 import { ReviewCard } from '@/components/ReviewCard';
 import { ReviewForm } from '@/components/ReviewForm';
-import { getProductReviews, getAverageRating } from '@/lib/reviews';
+import { fetchProductReviews, fetchAverageRating } from '@/lib/reviews';
 import {
   Accordion,
   AccordionContent,
@@ -19,13 +19,43 @@ import {
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = getProductById(id || '');
+  const location = useLocation();
+  const [product, setProduct] = useState<import('@/lib/products').Product | undefined>(undefined);
+  const [relatedProducts, setRelatedProducts] = useState([] as Awaited<ReturnType<typeof fetchFilteredProducts>>);
   const { addToCart } = useCart();
 
   const [selectedColor, setSelectedColor] = useState(product?.colors[0]);
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(0);
   const [refreshReviews, setRefreshReviews] = useState(0);
+  const [reviews, setReviews] = useState([] as Awaited<ReturnType<typeof fetchProductReviews>>);
+  const [averageRating, setAverageRating] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      if (!id) return;
+      const p = await fetchProductById(id);
+      setProduct(p);
+      if (p) {
+        setSelectedColor(p.colors[0]);
+        const rel = await fetchFilteredProducts(p.category, undefined);
+        setRelatedProducts(rel.filter(r => r.id !== p.id).slice(0, 3));
+        const [rs, avg] = await Promise.all([
+          fetchProductReviews(p.id),
+          fetchAverageRating(p.id),
+        ]);
+        setReviews(rs);
+        setAverageRating(avg);
+      }
+    })();
+  }, [id, refreshReviews]);
+
+  useEffect(() => {
+    if (location.hash === '#reviews') {
+      const el = document.getElementById('reviews-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [location.hash]);
 
   if (!product) {
     return (
@@ -40,9 +70,7 @@ export default function ProductDetail() {
     );
   }
 
-  const relatedProducts = mockProducts
-    .filter(p => p.id !== product.id && p.category === product.category)
-    .slice(0, 3);
+  
 
   const handleAddToCart = () => {
     if (!selectedColor) return;
@@ -214,7 +242,7 @@ export default function ProductDetail() {
         </div>
 
         {/* Reviews Section */}
-        <div className="border-t border-border pt-20">
+        <div id="reviews-section" className="border-t border-border pt-20">
           <h2 className="text-3xl font-bold mb-2">Customer Reviews</h2>
 
           {/* Review Stats */}
@@ -222,10 +250,10 @@ export default function ProductDetail() {
             <div className="md:col-span-1">
               <div className="space-y-4">
                 <div>
-                  <p className="text-4xl font-bold text-accent">{getAverageRating(id || '').toFixed(1)}</p>
-                  <StarRating rating={getAverageRating(id || '')} showText={false} size="lg" />
+                  <p className="text-4xl font-bold text-accent">{averageRating.toFixed(1)}</p>
+                  <StarRating rating={averageRating} showText={false} size="lg" />
                   <p className="text-sm text-muted-foreground mt-2">
-                    Based on {getProductReviews(id || '').length} reviews
+                    Based on {reviews.length} reviews
                   </p>
                 </div>
               </div>
@@ -243,9 +271,9 @@ export default function ProductDetail() {
           {/* Reviews List */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold">All Reviews</h3>
-            {getProductReviews(id || '').length > 0 ? (
+            {reviews.length > 0 ? (
               <div className="space-y-4">
-                {getProductReviews(id || '').map(review => (
+                {reviews.map(review => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
               </div>

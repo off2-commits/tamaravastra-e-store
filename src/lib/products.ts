@@ -168,3 +168,87 @@ export function filterProducts(category?: string, maxPrice?: number): Product[] 
   
   return filtered;
 }
+
+import { supabase } from './supabaseClient';
+
+export async function fetchProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .limit(100);
+  if (error || !data) return mockProducts;
+  return data.map(row => ({
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    image: row.image,
+    images: Array.isArray(row.images) ? row.images : [],
+    category: row.category,
+    colors: Array.isArray(row.colors) ? row.colors : [],
+    description: row.description || '',
+    stock: Number(row.stock || 0),
+    isBestseller: !!row.is_bestseller,
+  }));
+}
+
+export async function fetchBestsellers(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_bestseller', true)
+    .limit(4);
+  if (error || !data) return getBestsellers();
+  return data.map(row => ({
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    image: row.image,
+    images: Array.isArray(row.images) ? row.images : [],
+    category: row.category,
+    colors: Array.isArray(row.colors) ? row.colors : [],
+    description: row.description || '',
+    stock: Number(row.stock || 0),
+    isBestseller: !!row.is_bestseller,
+  }));
+}
+
+export async function fetchProductById(id: string): Promise<Product | undefined> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error || !data) return getProductById(id);
+  return {
+    id: data.id,
+    name: data.name,
+    price: Number(data.price),
+    image: data.image,
+    images: Array.isArray(data.images) ? data.images : [],
+    category: data.category,
+    colors: Array.isArray(data.colors) ? data.colors : [],
+    description: data.description || '',
+    stock: Number(data.stock || 0),
+    isBestseller: !!data.is_bestseller,
+  };
+}
+
+export async function fetchFilteredProducts(category?: string, maxPrice?: number): Promise<Product[]> {
+  let query = supabase.from('products').select('*');
+  if (category && category !== 'all') query = query.eq('category', category);
+  if (maxPrice && maxPrice > 0) query = query.lte('price', maxPrice);
+  const { data, error } = await query.limit(200);
+  if (error || !data) return filterProducts(category, maxPrice);
+  return data.map(row => ({
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    image: row.image,
+    images: Array.isArray(row.images) ? row.images : [],
+    category: row.category,
+    colors: Array.isArray(row.colors) ? row.colors : [],
+    description: row.description || '',
+    stock: Number(row.stock || 0),
+    isBestseller: !!row.is_bestseller,
+  }));
+}

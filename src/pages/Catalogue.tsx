@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '@/components/ProductCard';
-import { filterProducts } from '@/lib/products';
+import { fetchFilteredProducts } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -17,11 +17,17 @@ export default function Catalogue() {
   const [category, setCategory] = useState(searchParams.get('category') || 'all');
   const [maxPrice, setMaxPrice] = useState(40000);
   const [sortBy, setSortBy] = useState('newest');
+  const [products, setProducts] = useState([] as Awaited<ReturnType<typeof fetchFilteredProducts>>);
 
-  const products = filterProducts(
-    category === 'all' ? undefined : category,
-    maxPrice
-  );
+  useEffect(() => {
+    (async () => {
+      const data = await fetchFilteredProducts(category === 'all' ? undefined : category, maxPrice);
+      let sorted = data;
+      if (sortBy === 'price-low') sorted = [...data].sort((a, b) => a.price - b.price);
+      if (sortBy === 'price-high') sorted = [...data].sort((a, b) => b.price - a.price);
+      setProducts(sorted);
+    })();
+  }, [category, maxPrice, sortBy]);
 
   useEffect(() => {
     const cat = searchParams.get('category');

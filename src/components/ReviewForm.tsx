@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StarRating } from './StarRating';
-import { addReview, verifyPurchaser } from '@/lib/reviews';
+import { insertReview, verifyPurchaserRemote } from '@/lib/reviews';
 
 interface ReviewFormProps {
   productId: string;
@@ -31,7 +31,7 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
 
   const [imagePreview, setImagePreview] = useState<string[]>([]);
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     setVerifyError('');
 
     if (!verifyEmail && !verifyPhone) {
@@ -44,7 +44,8 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
       return;
     }
 
-    if (!verifyPurchaser(verifyEmail, verifyPhone, productId)) {
+    const ok = await verifyPurchaserRemote(verifyEmail, verifyPhone, productId);
+    if (!ok) {
       setVerifyError('No verified purchase found with this email or phone number');
       return;
     }
@@ -109,7 +110,7 @@ export function ReviewForm({ productId, onReviewSubmitted }: ReviewFormProps) {
     setIsSubmitting(true);
 
     try {
-      addReview({
+      await insertReview({
         productId,
         reviewerName: formData.reviewerName,
         reviewerEmail: formData.reviewerEmail,

@@ -132,6 +132,21 @@ All colors MUST be HSL.
     @apply mx-auto px-4 sm:px-6 lg:px-8;
     max-width: 1400px;
   }
+
+  /* Lazy reveal animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    will-change: opacity, transform;
+  }
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+  .reveal[data-animation="fade-in"] {
+    transform: none;
+  }
 }
 
 /* Page Transition Animations */
@@ -165,3 +180,13 @@ All colors MUST be HSL.
 .page-transition > *:nth-child(5) { animation-delay: 800ms; }
 .page-transition > *:nth-child(6) { animation-delay: 1000ms; }
 .page-transition > *:nth-child(n+7) { animation-delay: 1200ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .reveal-visible {
+    transition: none !important;
+  }
+}

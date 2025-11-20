@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { createOrder, OrderItem } from '@/lib/orders';
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
@@ -44,14 +45,44 @@ export default function Checkout() {
 
     setIsProcessing(true);
 
-    // Simulate payment processing
-    setTimeout(() => {
-      // In a real app, integrate Razorpay here
-      const orderId = 'ORD' + Date.now();
+    try {
+      const subtotal = totalPrice;
+      const shipping = 0;
+      const tax = 0;
+      const total = subtotal + shipping + tax;
+      const orderPayload = {
+        subtotal,
+        shipping,
+        tax,
+        total,
+        payment_method: 'Demo',
+        payment_status: 'Completed',
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        address: `${formData.address1}${formData.address2 ? ', ' + formData.address2 : ''}`,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+        country: 'India',
+        status: 'Processing',
+      };
+      const itemsPayload: OrderItem[] = items.map(i => ({
+        product_id: i.id,
+        name: i.name,
+        price: i.price,
+        quantity: i.quantity,
+        color: i.color,
+      }));
+      const res = await createOrder(orderPayload, itemsPayload);
+      if (!res) throw new Error('Failed to create order');
       clearCart();
       toast.success('Order placed successfully!');
-      navigate(`/order/${orderId}`);
-    }, 2000);
+      navigate(`/order/${res.orderId}`);
+    } catch (err) {
+      toast.error('Failed to place order. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   if (items.length === 0) {

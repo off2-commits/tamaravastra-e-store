@@ -1,117 +1,70 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Package, CreditCard, User, Mail, Phone, Edit2, Trash2, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getProductReviews, mockReviews } from '@/lib/reviews';
+import { fetchOrder, fetchOrderItems, updateOrderStatus, updateOrderCustomer } from '@/lib/orders';
+import { fetchOrderReviews } from '@/lib/reviews';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
-// Mock detailed order data
-const MOCK_ORDER_DETAILS: Record<string, any> = {
-  'ORD-001': {
-    id: 'ORD-001',
-    date: '2024-01-15',
-    status: 'Delivered',
-    items: [
-      { name: 'Royal Banarasi Silk Saree', quantity: 1, price: 12500, color: 'Maroon' }
-    ],
-    subtotal: 12500,
-    shipping: 0,
-    tax: 0,
-    total: 12500,
-    paymentMethod: 'Credit Card',
-    paymentStatus: 'Completed',
-    customer: {
-      name: 'Priya Sharma',
-      email: 'priya.sharma@email.com',
-      phone: '+91 98765 43210',
-      address: '123 Silk Lane, Delhi, 110001',
-      city: 'Delhi',
-      state: 'Delhi',
-      pincode: '110001',
-      country: 'India'
-    },
-    deliveryDate: '2024-01-18',
-    trackingNumber: 'TRK-2024-001234',
-    notes: 'Delivered to recipient'
+const formatOrder = (o: any, items: any[]) => ({
+  id: o.id,
+  date: (o.date || '').slice(0, 10),
+  status: o.status || 'Processing',
+  items: items.map(i => ({ name: i.name, quantity: i.quantity, price: Number(i.price), color: i.color })),
+  subtotal: Number(o.subtotal) || 0,
+  shipping: Number(o.shipping) || 0,
+  tax: Number(o.tax) || 0,
+  total: Number(o.total) || 0,
+  paymentMethod: o.payment_method || 'Demo',
+  paymentStatus: o.payment_status || 'Completed',
+  customer: {
+    name: o.customer_name,
+    email: o.customer_email,
+    phone: o.customer_phone,
+    address: o.address,
+    city: o.city,
+    state: o.state,
+    pincode: o.pincode,
+    country: o.country || 'India',
   },
-  'ORD-002': {
-    id: 'ORD-002',
-    date: '2024-01-18',
-    status: 'Processing',
-    items: [
-      { name: 'Designer Party Wear Saree', quantity: 1, price: 18999, color: 'Emerald' }
-    ],
-    subtotal: 18999,
-    shipping: 0,
-    tax: 0,
-    total: 18999,
-    paymentMethod: 'Debit Card',
-    paymentStatus: 'Completed',
-    customer: {
-      name: 'Anjali Patel',
-      email: 'anjali.patel@email.com',
-      phone: '+91 98765 43211',
-      address: '456 Silk Road, Mumbai, 400001',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400001',
-      country: 'India'
-    },
-    deliveryDate: null,
-    trackingNumber: null,
-    notes: 'Order being prepared for shipment'
-  },
-  'ORD-003': {
-    id: 'ORD-003',
-    date: '2024-01-19',
-    status: 'Shipped',
-    items: [
-      { name: 'Royal Banarasi Silk Saree', quantity: 1, price: 12500, color: 'Gold' },
-      { name: 'Pure Kanjivaram Silk', quantity: 1, price: 12500, color: 'Mustard' }
-    ],
-    subtotal: 25000,
-    shipping: 0,
-    tax: 0,
-    total: 25000,
-    paymentMethod: 'UPI',
-    paymentStatus: 'Completed',
-    customer: {
-      name: 'Neha Gupta',
-      email: 'neha.gupta@email.com',
-      phone: '+91 98765 43212',
-      address: '789 Heritage Street, Bangalore, 560001',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      pincode: '560001',
-      country: 'India'
-    },
-    deliveryDate: '2024-01-23',
-    trackingNumber: 'TRK-2024-001235',
-    notes: 'Shipped via Express Courier'
-  }
-};
+  deliveryDate: o.delivery_date,
+  trackingNumber: o.tracking_number,
+  notes: o.notes,
+});
 
 export default function AdminOrderDetail() {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const order = MOCK_ORDER_DETAILS[orderId || ''];
+  const [order, setOrder] = useState<any | null>(null);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [orderStatus, setOrderStatus] = useState(order?.status || '');
-  const [customerData, setCustomerData] = useState(order?.customer || {});
+  const [orderStatus, setOrderStatus] = useState('');
+  const [customerData, setCustomerData] = useState<any>({});
+  const [orderReviews, setOrderReviews] = useState([] as Awaited<ReturnType<typeof fetchOrderReviews>>);
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
-  // Get reviews for products in this order
-  const orderReviews = order ? order.items.flatMap(item =>
-    getProductReviews(item.name)
-      .filter(review => review.orderId === orderId)
-  ) : [];
+  useEffect(() => {
+    (async () => {
+      if (!orderId) return;
+      const o = await fetchOrder(orderId);
+      const items = await fetchOrderItems(orderId);
+      if (o) {
+        const formatted = formatOrder(o, items);
+        setOrder(formatted);
+        setOrderStatus(formatted.status);
+        setCustomerData(formatted.customer);
+      }
+      const reviews = await fetchOrderReviews(orderId);
+      setOrderReviews(reviews);
+    })();
+  }, [orderId]);
 
-  const handleDeleteReview = (reviewId: string) => {
-    const reviewIndex = mockReviews.findIndex(r => r.id === reviewId);
-    if (reviewIndex > -1) {
-      mockReviews.splice(reviewIndex, 1);
-    }
-  };
+  // Reviews fetched above by order_id
+
+  const handleDeleteReview = async (reviewId: string) => {};
 
   if (!order) {
     return (
@@ -167,7 +120,10 @@ export default function AdminOrderDetail() {
                   <span className="text-muted-foreground">Status:</span>
                   <select
                     value={orderStatus}
-                    onChange={(e) => setOrderStatus(e.target.value)}
+                    onChange={(e) => {
+                      setPendingStatus(e.target.value);
+                      setStatusConfirmOpen(true);
+                    }}
                     className="px-3 py-1 rounded-lg border border-border bg-background text-sm font-medium"
                   >
                     <option value="Processing">Processing</option>
@@ -278,7 +234,28 @@ export default function AdminOrderDetail() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => setIsEditingCustomer(!isEditingCustomer)}
+                  onClick={async () => {
+                    if (!isEditingCustomer) {
+                      setIsEditingCustomer(true);
+                    } else if (order) {
+                      const ok = await updateOrderCustomer(order.id, {
+                        customer_name: customerData.name,
+                        customer_email: customerData.email,
+                        customer_phone: customerData.phone,
+                        address: customerData.address,
+                        city: customerData.city,
+                        state: customerData.state,
+                        pincode: customerData.pincode,
+                        country: customerData.country,
+                      });
+                      if (ok) {
+                        toast.success('Customer details updated');
+                        setIsEditingCustomer(false);
+                      } else {
+                        toast.error('Failed to update customer details');
+                      }
+                    }
+                  }}
                   className="flex items-center gap-2"
                 >
                   <Edit2 className="h-4 w-4" />
@@ -387,7 +364,7 @@ export default function AdminOrderDetail() {
             </Card>
 
             {/* Reviews Section */}
-            <Card>
+            <Card className="mt-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="h-5 w-5" />
@@ -454,8 +431,37 @@ export default function AdminOrderDetail() {
                 )}
               </CardContent>
             </Card>
-          </div>
-        </div>
+    </div>
+  </div>
+  <AlertDialog open={statusConfirmOpen} onOpenChange={setStatusConfirmOpen}>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Change order status</AlertDialogTitle>
+        <AlertDialogDescription>
+          Update status to {pendingStatus}. This will be saved to the backend.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogAction
+          onClick={async () => {
+            if (!order || !pendingStatus) return;
+            const ok = await updateOrderStatus(order.id, pendingStatus);
+            if (ok) {
+              setOrderStatus(pendingStatus);
+              toast.success('Order status updated');
+            } else {
+              toast.error('Failed to update order status');
+            }
+            setStatusConfirmOpen(false);
+            setPendingStatus(null);
+          }}
+        >
+          Confirm
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
       </div>
     </div>
   );

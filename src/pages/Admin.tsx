@@ -5,16 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { verifyAdminLogin, setAdminSession, getAdminSession, clearAdminSession } from '@/lib/auth-utils';
-import { mockProducts } from '@/lib/products';
+import { mockProducts, fetchProducts } from '@/lib/products';
+import { fetchOrders, fetchOrderItems } from '@/lib/orders';
 
-// Mock data for admin dashboard
-const MOCK_ORDERS = [
-  { id: 'ORD-001', customer: 'Priya Sharma', total: 12500, status: 'Delivered', date: '2024-01-15', items: 1 },
-  { id: 'ORD-002', customer: 'Anjali Patel', total: 18999, status: 'Processing', date: '2024-01-18', items: 1 },
-  { id: 'ORD-003', customer: 'Neha Gupta', total: 25000, status: 'Shipped', date: '2024-01-19', items: 2 },
-  { id: 'ORD-004', customer: 'Deepika Singh', total: 9750, status: 'Delivered', date: '2024-01-20', items: 1 },
-  { id: 'ORD-005', customer: 'Meera Reddy', total: 31499, status: 'Processing', date: '2024-01-21', items: 3 },
-];
+interface AdminOrderRow { id: string; customer: string; total: number; status: string; date: string; items: number }
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -24,6 +18,8 @@ export default function Admin() {
   const [error, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [orders, setOrders] = useState<AdminOrderRow[]>([]);
+  const [products, setProducts] = useState(mockProducts);
 
   // Check if already logged in
   useEffect(() => {
@@ -33,6 +29,39 @@ export default function Admin() {
     }
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!isLoggedIn) return;
+      const list = await fetchOrders(50);
+      const rows: AdminOrderRow[] = [];
+      const ids = list.map(o => o.id);
+      const counts: Record<string, number> = {};
+      // Fetch items count per order
+      await Promise.all(ids.map(async (id) => {
+        const items = await fetchOrderItems(id);
+        counts[id] = items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
+      }));
+      for (const o of list) {
+        rows.push({
+          id: o.id,
+          customer: o.customer_name,
+          total: Number(o.total) || 0,
+          status: o.status || 'Processing',
+          date: (o.date || '').slice(0, 10),
+          items: counts[o.id] || 0,
+        });
+      }
+      setOrders(rows);
+    })();
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    (async () => {
+      const list = await fetchProducts();
+      if (list && list.length > 0) setProducts(list);
+    })();
+  }, [isLoggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,11 +161,11 @@ export default function Admin() {
   }
 
   // Calculate dashboard metrics
-  const totalOrders = MOCK_ORDERS.length;
-  const totalRevenue = MOCK_ORDERS.reduce((sum, order) => sum + order.total, 0);
-  const totalProducts = mockProducts.length;
-  const avgOrderValue = totalRevenue / totalOrders;
-  const deliveredOrders = MOCK_ORDERS.filter(o => o.status === 'Delivered').length;
+  const totalOrders = orders.length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalProducts = products.length;
+  const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
+  const deliveredOrders = orders.filter(o => o.status === 'Delivered').length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -230,7 +259,7 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {MOCK_ORDERS.map((order) => (
+                  {orders.map((order) => (
                     <tr
                       key={order.id}
                       className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-smooth"
@@ -278,7 +307,7 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockProducts.slice(0, 5).map((product) => (
+                  {products.slice(0, 5).map((product) => (
                     <tr
                       key={product.id}
                       className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-smooth"

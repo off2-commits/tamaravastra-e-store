@@ -15,7 +15,15 @@ import Admin from "./pages/Admin";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminProductEdit from "./pages/AdminProductEdit";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import { useEffect } from "react";
+import ReplacementPolicy from "./pages/ReplacementPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import ReplacementRequest from "./pages/ReplacementRequest";
+import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -47,12 +55,20 @@ function AppContent() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:orderId" element={<OrderConfirmation />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/policy/replacement" element={<ReplacementPolicy />} />
+        <Route path="/policy/shipping" element={<ShippingPolicy />} />
+        <Route path="/policy/terms" element={<Terms />} />
+        <Route path="/policy/privacy" element={<Privacy />} />
+        <Route path="/replacement-request" element={<ReplacementRequest />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/order/:orderId" element={<AdminOrderDetail />} />
         <Route path="/admin/product/:productId" element={<AdminProductEdit />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </>
   );
 }
@@ -63,7 +79,7 @@ const App = () => (
       <CartProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AppContent />
         </BrowserRouter>
       </CartProvider>

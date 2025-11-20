@@ -1,33 +1,74 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Plus, Upload, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockProducts } from '@/lib/products';
+import { fetchProductById, Product } from '@/lib/products';
 
 export default function AdminProductEdit() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const product = mockProducts.find(p => p.id === productId);
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
-    name: product?.name || '',
-    price: product?.price || 0,
-    category: product?.category || '',
-    stock: product?.stock || 0,
-    description: product?.description || '',
+    name: '',
+    price: 0,
+    category: '',
+    stock: 0,
+    description: '',
     feature1: '',
     feature2: '',
     feature3: '',
-    colors: product?.colors || [{ name: '', hex: '' }],
+    colors: [{ name: '', hex: '' }],
   });
 
   const [images, setImages] = useState([
-    { id: 1, src: product?.image || '/placeholder.svg', name: 'Main Image' },
+    { id: 1, src: '/placeholder.svg', name: 'Main Image' },
   ]);
   const [draggedId, setDraggedId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (!productId) {
+        setIsLoading(false);
+        return;
+      }
+      const p = await fetchProductById(productId);
+      setProduct(p);
+      if (p) {
+        setFormData({
+          name: p.name,
+          price: p.price,
+          category: p.category,
+          stock: p.stock,
+          description: p.description,
+          feature1: '',
+          feature2: '',
+          feature3: '',
+          colors: p.colors && p.colors.length > 0 ? p.colors : [{ name: '', hex: '' }],
+        });
+        const main = p.images && p.images.length > 0 ? p.images[0] : p.image;
+        const imgs = (p.images && p.images.length > 0 ? p.images : [main]).filter(Boolean);
+        setImages(imgs.map((src, i) => ({ id: i + 1, src, name: i === 0 ? 'Main Image' : `Image ${i + 1}` })));
+      }
+      setIsLoading(false);
+    })();
+  }, [productId]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 text-center">
+            <p className="text-lg font-semibold mb-4">Loading product...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!product) {
     return (

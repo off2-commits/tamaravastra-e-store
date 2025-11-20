@@ -125,3 +125,108 @@ export function addReview(review: Omit<Review, 'id' | 'date'>): Review {
   mockReviews.push(newReview);
   return newReview;
 }
+
+import { supabase } from './supabaseClient';
+
+export async function fetchProductReviews(productId: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('product_id', productId)
+    .order('date', { ascending: false });
+  if (error || !data) return getProductReviews(productId);
+  return data.map(r => ({
+    id: r.id,
+    productId: r.product_id,
+    reviewerName: r.reviewer_name,
+    reviewerEmail: r.reviewer_email || '',
+    reviewerPhone: r.reviewer_phone || '',
+    rating: Number(r.rating),
+    title: r.title || '',
+    text: r.text || '',
+    images: Array.isArray(r.images) ? r.images : [],
+    date: r.date,
+    verified: !!r.verified,
+    orderId: r.order_id || ''
+  }));
+}
+
+export async function insertReview(review: Omit<Review, 'id' | 'date'>): Promise<Review> {
+  const payload = {
+    product_id: review.productId,
+    reviewer_name: review.reviewerName,
+    reviewer_email: review.reviewerEmail,
+    reviewer_phone: review.reviewerPhone,
+    rating: review.rating,
+    title: review.title,
+    text: review.text,
+    images: review.images,
+    verified: review.verified,
+    order_id: review.orderId || null,
+  };
+  const { data, error } = await supabase.from('reviews').insert(payload).select('*').maybeSingle();
+  if (error || !data) return addReview(review);
+  return {
+    id: data.id,
+    productId: data.product_id,
+    reviewerName: data.reviewer_name,
+    reviewerEmail: data.reviewer_email || '',
+    reviewerPhone: data.reviewer_phone || '',
+    rating: Number(data.rating),
+    title: data.title || '',
+    text: data.text || '',
+    images: Array.isArray(data.images) ? data.images : [],
+    date: data.date,
+    verified: !!data.verified,
+    orderId: data.order_id || ''
+  };
+}
+
+export async function fetchAverageRating(productId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('rating')
+    .eq('product_id', productId);
+  if (error || !data || data.length === 0) return getAverageRating(productId);
+  const sum = data.reduce((acc, r) => acc + Number(r.rating), 0);
+  return Math.round((sum / data.length) * 10) / 10;
+}
+
+export async function verifyPurchaserRemote(email: string, phone: string, productId: string): Promise<boolean> {
+  const { data: orders, error: ordersErr } = await supabase
+    .from('orders')
+    .select('id, customer_email, customer_phone')
+    .or(`customer_email.eq.${email},customer_phone.eq.${phone}`);
+  if (ordersErr || !orders || orders.length === 0) return verifyPurchaser(email, phone, productId);
+  const orderIds = orders.map(o => o.id);
+  const { data: items, error: itemsErr } = await supabase
+    .from('order_items')
+    .select('order_id, product_id')
+    .in('order_id', orderIds)
+    .eq('product_id', productId);
+  if (itemsErr || !items) return verifyPurchaser(email, phone, productId);
+  return items.length > 0;
+}
+
+export async function fetchOrderReviews(orderId: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('order_id', orderId)
+    .order('date', { ascending: false });
+  if (error || !data) return [];
+  return data.map(r => ({
+    id: r.id,
+    productId: r.product_id,
+    reviewerName: r.reviewer_name,
+    reviewerEmail: r.reviewer_email || '',
+    reviewerPhone: r.reviewer_phone || '',
+    rating: Number(r.rating),
+    title: r.title || '',
+    text: r.text || '',
+    images: Array.isArray(r.images) ? r.images : [],
+    date: r.date,
+    verified: !!r.verified,
+    orderId: r.order_id || ''
+  }));
+}

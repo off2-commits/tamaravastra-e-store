@@ -40,16 +40,20 @@ export default function Cart() {
             {items.map(item => (
               <div key={`${item.id}-${item.color}`} className="bg-card border border-border rounded-lg p-4">
                 <div className="flex gap-4">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-24 h-32 object-cover rounded"
-                  />
-                  
+                  <Link to={`/product/${item.id}`} className="shrink-0">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-24 h-32 object-cover rounded hover:opacity-90 transition-smooth"
+                    />
+                  </Link>
+
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="font-medium mb-1">{item.name}</h3>
+                        <Link to={`/product/${item.id}`} className="hover:underline text-accent">
+                          <h3 className="font-medium mb-1">{item.name}</h3>
+                        </Link>
                         <p className="text-sm text-muted-foreground">Color: {item.color}</p>
                       </div>
                       <Button
@@ -81,7 +85,7 @@ export default function Cart() {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      
+
                       <p className="text-lg font-bold text-accent">
                         ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                       </p>
