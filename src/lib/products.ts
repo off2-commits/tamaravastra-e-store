@@ -2,6 +2,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  discount_price?: number;
   image: string;
   images: string[];
   category: 'cotton' | 'silk' | 'party-wear' | 'designer';
@@ -21,6 +22,7 @@ export const mockProducts: Product[] = [
     id: '1',
     name: 'Royal Banarasi Silk Saree',
     price: 12500,
+    discount_price: 11000,
     image: saree1,
     images: [saree1, saree1, saree1],
     category: 'silk',
@@ -85,6 +87,7 @@ export const mockProducts: Product[] = [
     id: '5',
     name: 'Soft Linen Blend Saree',
     price: 3200,
+    discount_price: 2800,
     image: saree2,
     images: [saree2, saree2, saree2],
     category: 'cotton',
@@ -157,15 +160,15 @@ export function getBestsellers(): Product[] {
 
 export function filterProducts(category?: string, maxPrice?: number): Product[] {
   let filtered = mockProducts;
-  
+
   if (category && category !== 'all') {
     filtered = filtered.filter(p => p.category === category);
   }
-  
+
   if (maxPrice) {
     filtered = filtered.filter(p => p.price <= maxPrice);
   }
-  
+
   return filtered;
 }
 
@@ -181,6 +184,7 @@ export async function fetchProducts(): Promise<Product[]> {
     id: row.id,
     name: row.name,
     price: Number(row.price),
+    discount_price: row.discount_price ? Number(row.discount_price) : undefined,
     image: row.image,
     images: Array.isArray(row.images) ? row.images : [],
     category: row.category,
@@ -202,6 +206,7 @@ export async function fetchBestsellers(): Promise<Product[]> {
     id: row.id,
     name: row.name,
     price: Number(row.price),
+    discount_price: row.discount_price ? Number(row.discount_price) : undefined,
     image: row.image,
     images: Array.isArray(row.images) ? row.images : [],
     category: row.category,
@@ -223,6 +228,7 @@ export async function fetchProductById(id: string): Promise<Product | undefined>
     id: data.id,
     name: data.name,
     price: Number(data.price),
+    discount_price: data.discount_price ? Number(data.discount_price) : undefined,
     image: data.image,
     images: Array.isArray(data.images) ? data.images : [],
     category: data.category,
@@ -243,6 +249,7 @@ export async function fetchFilteredProducts(category?: string, maxPrice?: number
     id: row.id,
     name: row.name,
     price: Number(row.price),
+    discount_price: row.discount_price ? Number(row.discount_price) : undefined,
     image: row.image,
     images: Array.isArray(row.images) ? row.images : [],
     category: row.category,

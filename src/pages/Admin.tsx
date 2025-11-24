@@ -227,12 +227,12 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/admin/coupons')}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Avg Order Value</p>
-                  <p className="text-3xl font-bold">₹{avgOrderValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Coupons</p>
+                  <p className="text-lg font-bold">Manage</p>
                 </div>
                 <Users className="h-10 w-10 text-muted-foreground opacity-50" />
               </div>
@@ -270,13 +270,12 @@ export default function Admin() {
                       <td className="py-3 px-4">{order.items}</td>
                       <td className="py-3 px-4 font-bold text-accent">₹{order.total.toLocaleString('en-IN')}</td>
                       <td className="py-3 px-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          order.status === 'Delivered'
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'Delivered'
                             ? 'bg-green-100 text-green-800'
                             : order.status === 'Shipped'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
                           {order.status}
                         </span>
                       </td>
@@ -324,13 +323,12 @@ export default function Admin() {
                       <td className="py-3 px-4">{product.stock} units</td>
                       <td className="py-3 px-4 font-bold text-accent">₹{product.price.toLocaleString('en-IN')}</td>
                       <td className="py-3 px-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          product.stock > 15
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${product.stock > 15
                             ? 'bg-green-100 text-green-800'
                             : product.stock > 5
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
                           {product.stock > 15 ? 'In Stock' : product.stock > 5 ? 'Low Stock' : 'Critical'}
                         </span>
                       </td>

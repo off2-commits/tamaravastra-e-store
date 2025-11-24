@@ -38,9 +38,20 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
 
-          <p className="text-lg font-bold text-accent mb-4">
-            ₹{product.price.toLocaleString('en-IN')}
-          </p>
+          {product.discount_price && product.discount_price < product.price ? (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-sm text-muted-foreground line-through">
+                ₹{product.price.toLocaleString('en-IN')}
+              </span>
+              <span className="text-lg font-bold text-accent">
+                ₹{product.discount_price.toLocaleString('en-IN')}
+              </span>
+            </div>
+          ) : (
+            <p className="text-lg font-bold text-accent mb-4">
+              ₹{product.price.toLocaleString('en-IN')}
+            </p>
+          )}
           <div className="flex gap-3 justify-center">
             {product.colors.slice(0, 3).map((color, i) => (
               <div

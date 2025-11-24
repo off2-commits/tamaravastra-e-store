@@ -14,6 +14,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Admin from "./pages/Admin";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminProductEdit from "./pages/AdminProductEdit";
+import AdminCoupons from "./pages/AdminCoupons";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -65,6 +66,7 @@ function AppContent() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/order/:orderId" element={<AdminOrderDetail />} />
         <Route path="/admin/product/:productId" element={<AdminProductEdit />} />
+        <Route path="/admin/coupons" element={<AdminCoupons />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

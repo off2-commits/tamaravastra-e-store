@@ -15,6 +15,7 @@ export default function AdminProductEdit() {
   const [formData, setFormData] = useState({
     name: '',
     price: 0,
+    discount_price: 0,
     category: '',
     stock: 0,
     description: '',
@@ -23,6 +24,8 @@ export default function AdminProductEdit() {
     feature3: '',
     colors: [{ name: '', hex: '' }],
   });
+
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   const [images, setImages] = useState([
     { id: 1, src: '/placeholder.svg', name: 'Main Image' },
@@ -42,6 +45,7 @@ export default function AdminProductEdit() {
         setFormData({
           name: p.name,
           price: p.price,
+          discount_price: p.discount_price || 0,
           category: p.category,
           stock: p.stock,
           description: p.description,
@@ -89,7 +93,7 @@ export default function AdminProductEdit() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'stock' ? parseFloat(value) || 0 : value
+      [name]: name === 'price' || name === 'stock' || name === 'discount_price' ? parseFloat(value) || 0 : value
     }));
   };
 
@@ -113,20 +117,14 @@ export default function AdminProductEdit() {
     }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setImages(prev => [...prev, {
-            id: Date.now() + Math.random(),
-            src: event.target?.result as string,
-            name: file.name
-          }]);
-        };
-        reader.readAsDataURL(file);
-      });
+  const handleAddImage = () => {
+    if (newImageUrl) {
+      setImages(prev => [...prev, {
+        id: Date.now(),
+        src: newImageUrl,
+        name: `Image ${prev.length + 1}`
+      }]);
+      setNewImageUrl('');
     }
   };
 
@@ -225,7 +223,7 @@ export default function AdminProductEdit() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Category *</label>
                     <select
@@ -247,6 +245,16 @@ export default function AdminProductEdit() {
                       name="price"
                       type="number"
                       value={formData.price}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Discount Price (₹)</label>
+                    <Input
+                      name="discount_price"
+                      type="number"
+                      value={formData.discount_price}
                       onChange={handleInputChange}
                       placeholder="0"
                     />
@@ -292,9 +300,8 @@ export default function AdminProductEdit() {
                       onDragStart={() => handleDragStart(image.id)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, image.id)}
-                      className={`relative aspect-square rounded-lg overflow-hidden border-2 border-dashed cursor-move transition-all ${
-                        draggedId === image.id ? 'opacity-50 border-accent' : 'border-border hover:border-accent'
-                      }`}
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 border-dashed cursor-move transition-all ${draggedId === image.id ? 'opacity-50 border-accent' : 'border-border hover:border-accent'
+                        }`}
                     >
                       <img src={image.src} alt={image.name} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all flex items-center justify-center gap-2">
@@ -310,19 +317,25 @@ export default function AdminProductEdit() {
                       </div>
                     </div>
                   ))}
-                  <label className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-accent transition-all flex items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted">
-                    <div className="text-center">
-                      <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-xs text-muted-foreground">Upload</p>
+                  <div className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-accent transition-all flex flex-col items-center justify-center p-4 bg-muted/50 hover:bg-muted">
+                    <div className="text-center w-full">
+                      <p className="text-xs text-muted-foreground mb-2">Add Image URL</p>
+                      <Input
+                        value={newImageUrl}
+                        onChange={(e) => setNewImageUrl(e.target.value)}
+                        placeholder="https://..."
+                        className="mb-2 h-8 text-xs"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleAddImage}
+                        disabled={!newImageUrl}
+                        className="w-full h-8"
+                      >
+                        <Plus className="h-3 w-3 mr-1" /> Add
+                      </Button>
                     </div>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">Drag to reorder images. First image will be the main product image.</p>
               </CardContent>
@@ -450,7 +463,14 @@ export default function AdminProductEdit() {
 
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Price</p>
-                    <p className="text-lg font-bold text-accent">₹{formData.price.toLocaleString('en-IN')}</p>
+                    {formData.discount_price && formData.discount_price < formData.price ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground line-through">₹{formData.price.toLocaleString('en-IN')}</span>
+                        <span className="text-lg font-bold text-accent">₹{formData.discount_price.toLocaleString('en-IN')}</span>
+                      </div>
+                    ) : (
+                      <p className="text-lg font-bold text-accent">₹{formData.price.toLocaleString('en-IN')}</p>
+                    )}
                   </div>
 
                   <div>
@@ -469,13 +489,12 @@ export default function AdminProductEdit() {
 
                   <div className="pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Stock</p>
-                    <p className={`font-medium text-sm ${
-                      formData.stock > 15
-                        ? 'text-green-600'
-                        : formData.stock > 5
+                    <p className={`font-medium text-sm ${formData.stock > 15
+                      ? 'text-green-600'
+                      : formData.stock > 5
                         ? 'text-yellow-600'
                         : 'text-red-600'
-                    }`}>
+                      }`}>
                       {formData.stock} units {formData.stock > 15 ? '✓' : ''}
                     </p>
                   </div>
