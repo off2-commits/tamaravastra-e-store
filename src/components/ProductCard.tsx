@@ -2,15 +2,26 @@ import { Link } from 'react-router-dom';
 import { Product } from '@/lib/products';
 import { Card, CardContent } from '@/components/ui/card';
 import { StarRating } from './StarRating';
-import { getAverageRating, getProductReviews } from '@/lib/reviews';
+import { fetchProductReviews } from '@/lib/reviews';
+import { useEffect, useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const averageRating = getAverageRating(product.id);
-  const reviewCount = getProductReviews(product.id).length;
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+
+  useEffect(() => {
+    fetchProductReviews(product.id).then(reviews => {
+      setReviewCount(reviews.length);
+      if (reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+        setAverageRating(Math.round((sum / reviews.length) * 10) / 10);
+      }
+    });
+  }, [product.id]);
 
   return (
     <Link to={`/product/${product.id}`}>

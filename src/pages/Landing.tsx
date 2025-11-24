@@ -96,9 +96,6 @@ export default function Landing() {
           <p className="text-lg sm:text-xl md:text-2xl mb-4 opacity-90 font-light tracking-wide max-w-2xl mx-auto">
             Where Tradition Meets Timeless Elegance
           </p>
-          <p className="text-base sm:text-lg mb-10 opacity-80 italic font-serif">
-            Handcrafted sarees for the modern Indian woman
-          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/catalogue">
@@ -176,7 +173,7 @@ export default function Landing() {
             <div className="lg:w-1/2 relative">
               <div className="absolute -top-4 -left-4 w-full h-full border-2 border-accent/30 rounded-lg z-0" />
               <img
-                src="https://images.unsplash.com/photo-1610189012906-4783fda31c5d?q=80&w=1000&auto=format&fit=crop"
+                src="/hero-saree.jpg"
                 alt="Weaving loom"
                 className="relative z-10 rounded-lg shadow-xl w-full aspect-[4/3] object-cover"
               />
@@ -184,16 +181,14 @@ export default function Landing() {
             <div className="lg:w-1/2 text-center lg:text-left">
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-primary">The Art of Weaving</h2>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                At Tamaravastra, we believe that every saree is a masterpiece. Our collection is sourced directly from
-                master weavers across India who have inherited their skills through generations.
+                At Tamaravastra, we act as connoisseurs of Indian heritage, meticulously selecting pieces that embody the pinnacle of craftsmanship. Our collection is a curated anthology of India's finest weaves, handpicked from the most esteemed looms across the country.
               </p>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                From the intricate Zari work of Banaras to the lightweight elegance of Chanderi,
-                we bring you authentic fabrics that celebrate India's rich textile heritage.
+                We bridge the gap between discerning admirers of art and the master artisans who create it. From the regal Zari of Banaras to the ethereal grace of Chanderi, each saree is chosen for its authenticity, quality, and the story it weaves.
               </p>
               <Link to="/about">
                 <Button variant="link" className="text-accent text-lg p-0 hover:no-underline group">
-                  Read Our Story <span className="inline-block transition-transform group-hover:translate-x-1 ml-1">→</span>
+                  Discover Our Process <span className="inline-block transition-transform group-hover:translate-x-1 ml-1">→</span>
                 </Button>
               </Link>
             </div>

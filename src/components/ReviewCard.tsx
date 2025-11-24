@@ -22,7 +22,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">{review.date}</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(review.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
             </div>
           </div>
 
