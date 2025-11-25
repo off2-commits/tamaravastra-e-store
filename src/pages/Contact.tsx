@@ -64,7 +64,8 @@ export default function Contact() {
                 <ul className="text-sm text-muted-foreground space-y-2">
                   <li>Hours: Mon–Sat, 10:00–18:00 IST</li>
                   <li>Response time: within 24–48 hours</li>
-                  <li>Email: support@tamaravastra.com</li>
+                  <li>Email: support@tamaravastra.online</li>
+                  <li>Phone: +91 9488069538</li>
                 </ul>
               </CardContent>
             </Card>
