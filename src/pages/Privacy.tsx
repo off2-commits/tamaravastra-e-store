@@ -51,7 +51,7 @@ export default function Privacy() {
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-2">Contact Us</h2>
               <p>
-                For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at <strong className="text-foreground">support@tamaravastra.online</strong> or by phone at <strong className="text-foreground">+91 9488069538</strong>.
+                For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by e-mail at <strong className="text-foreground">support@tamaravastra.store</strong> or by phone at <strong className="text-foreground">+91 9488069538</strong>.
               </p>
             </section>
           </CardContent >
