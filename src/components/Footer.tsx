@@ -13,6 +13,7 @@ export function Footer() {
         </div>
         <nav className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <Link to="/replacement-request" className="hover:text-accent">Request Replacement</Link>
+          <Link to="/policy/cancellation-return" className="hover:text-accent">Cancellation & Return</Link>
           <Link to="/policy/replacement" className="hover:text-accent">Replacement Policy</Link>
           <Link to="/policy/shipping" className="hover:text-accent">Shipping Policy</Link>
           <Link to="/policy/terms" className="hover:text-accent">Terms & Conditions</Link>

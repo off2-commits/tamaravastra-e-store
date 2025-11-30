@@ -24,6 +24,7 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import ReplacementRequest from "./pages/ReplacementRequest";
+import CancellationReturnPolicy from "./pages/CancellationReturnPolicy";
 import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ function AppContent() {
         <Route path="/policy/shipping" element={<ShippingPolicy />} />
         <Route path="/policy/terms" element={<Terms />} />
         <Route path="/policy/privacy" element={<Privacy />} />
+        <Route path="/policy/cancellation-return" element={<CancellationReturnPolicy />} />
         <Route path="/replacement-request" element={<ReplacementRequest />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/order/:orderId" element={<AdminOrderDetail />} />
